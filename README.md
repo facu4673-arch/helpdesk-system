@@ -262,7 +262,7 @@ Desde Swagger se pueden consultar los endpoints disponibles y probar las rutas p
 Clonar el repositorio:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/facu4673-arch/helpdesk-system.git
 ```
 
 Ingresar al backend:
