@@ -167,6 +167,22 @@ const getMyTickets = async (req, res) => {
 
 const getAllTickets = async (req, res) => {
     try {
+
+        const page = Math.max(
+            parseInt(req.query.page, 10) || 1,
+            1
+        );
+
+        const limit = Math.min(
+            Math.max(
+                parseInt(req.query.limit, 10) || 10,
+                1
+            ),
+            50
+        );
+
+        const offset = (page - 1) * limit;
+
         let where = {};
 
         // Si es SUPPORT, solo puede recibir:
@@ -185,7 +201,7 @@ const getAllTickets = async (req, res) => {
             };
         }
 
-        const tickets = await Ticket.findAll({
+        const result = await Ticket.findAndCountAll({
             where,
             include: [
                 {
@@ -203,10 +219,18 @@ const getAllTickets = async (req, res) => {
                     attributes: ["id", "name", "email"]
                 }
             ],
-            order: [["created_at", "DESC"]]
+            order: [["created_at", "DESC"]],
+            limit,
+            offset
         });
 
-        res.json(tickets);
+        res.json({
+            tickets: result.rows,
+            total: result.count,
+            page,
+            limit,
+            totalPages: Math.ceil(result.count / limit)
+        });
 
     } catch (error) {
         console.error("Error al obtener tickets:", error);

@@ -124,7 +124,13 @@ describe("Tickets API", () => {
 
         expect(response.statusCode).toBe(200);
 
-        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body).toHaveProperty("tickets");
+        expect(Array.isArray(response.body.tickets)).toBe(true);
+
+        expect(response.body).toHaveProperty("total");
+        expect(response.body).toHaveProperty("page", 1);
+        expect(response.body).toHaveProperty("limit", 10);
+        expect(response.body).toHaveProperty("totalPages");
 
     });
 
@@ -137,7 +143,13 @@ describe("Tickets API", () => {
 
         expect(response.statusCode).toBe(200);
 
-        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body).toHaveProperty("tickets");
+        expect(Array.isArray(response.body.tickets)).toBe(true);
+
+        expect(response.body).toHaveProperty("total");
+        expect(response.body).toHaveProperty("page", 1);
+        expect(response.body).toHaveProperty("limit", 10);
+        expect(response.body).toHaveProperty("totalPages");
 
     });
 
@@ -221,6 +233,64 @@ describe("Tickets API", () => {
             "message",
             "Estado inválido"
         );
+
+    });
+
+        test("GET /api/tickets debe respetar la paginación", async () => {
+
+        const response = await request(app)
+            .get("/api/tickets?page=1&limit=2")
+            .set("Authorization", `Bearer ${adminToken}`);
+
+        expect(response.statusCode).toBe(200);
+
+        expect(response.body.page).toBe(1);
+        expect(response.body.limit).toBe(2);
+        expect(response.body.tickets.length).toBeLessThanOrEqual(2);
+        expect(response.body).toHaveProperty("total");
+        expect(response.body).toHaveProperty("totalPages");
+
+    });
+
+
+    test("GET /api/tickets debe permitir consultar una segunda página", async () => {
+
+        const firstPage = await request(app)
+            .get("/api/tickets?page=1&limit=2")
+            .set("Authorization", `Bearer ${adminToken}`);
+
+        const secondPage = await request(app)
+            .get("/api/tickets?page=2&limit=2")
+            .set("Authorization", `Bearer ${adminToken}`);
+
+        expect(firstPage.statusCode).toBe(200);
+        expect(secondPage.statusCode).toBe(200);
+
+        expect(secondPage.body.page).toBe(2);
+        expect(secondPage.body.limit).toBe(2);
+
+        if (
+            firstPage.body.tickets.length > 0 &&
+            secondPage.body.tickets.length > 0
+        ) {
+            expect(secondPage.body.tickets[0].id)
+                .not
+                .toBe(firstPage.body.tickets[0].id);
+        }
+
+    });
+
+
+    test("GET /api/tickets debe limitar page y limit a valores válidos", async () => {
+
+        const response = await request(app)
+            .get("/api/tickets?page=0&limit=100")
+            .set("Authorization", `Bearer ${adminToken}`);
+
+        expect(response.statusCode).toBe(200);
+
+        expect(response.body.page).toBe(1);
+        expect(response.body.limit).toBe(50);
 
     });
 

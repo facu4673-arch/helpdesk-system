@@ -41,7 +41,7 @@ function AssignTickets() {
                 getUsers()
             ]);
 
-            setTickets(ticketsData);
+            setTickets(ticketsData.tickets);
 
             const supports = usersData.filter(
                 (user) => user.role === "support"

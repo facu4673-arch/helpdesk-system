@@ -184,6 +184,7 @@ Las contrasenas son almacenadas utilizando hashes generados con `bcryptjs`.
 | ------ | -------------------- | -------------------------------------- |
 | GET    | `/api/users/profile` | Obtener perfil del usuario autenticado |
 | GET    | `/api/users`         | Consultar usuarios segun permisos      |
+| POST   | `/api/users`         | Crear usuario desde el panel admin     |
 
 ### Tickets
 
@@ -191,11 +192,20 @@ Las contrasenas son almacenadas utilizando hashes generados con `bcryptjs`.
 | ------ | ------------------------- | --------------------------- |
 | POST   | `/api/tickets`            | Crear ticket                |
 | GET    | `/api/tickets/my`         | Obtener tickets del usuario |
-| GET    | `/api/tickets`            | Obtener tickets generales   |
+| GET    | `/api/tickets`            | Obtener tickets paginados   |
 | GET    | `/api/tickets/stats`      | Obtener estadisticas        |
 | GET    | `/api/tickets/:id`        | Obtener ticket por ID       |
 | PATCH  | `/api/tickets/:id/assign` | Asignar ticket              |
 | PATCH  | `/api/tickets/:id/status` | Actualizar estado           |
+
+### Paginación de tickets
+
+El endpoint `GET /api/tickets` permite consultar los tickets utilizando paginación mediante los parámetros `page` y `limit`.
+
+Ejemplo:
+
+```http
+GET /api/tickets?page=1&limit=10
 
 ### Comentarios
 
@@ -314,7 +324,7 @@ Estado actual de las pruebas:
 
 ```text
 Test Suites: 5 passed, 5 total
-Tests:       39 passed, 39 total
+Tests:       42 passed, 42 total
 ```
 
 Las pruebas cubren diferentes aspectos de la API, incluyendo:

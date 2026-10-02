@@ -66,7 +66,7 @@ function AllTickets() {
         const loadTickets = async () => {
             try {
                 const data = await getAllTickets();
-                setTickets(data);
+                setTickets(data.tickets);
             } catch (error) {
                 console.error("Error al cargar tickets:", error);
 

@@ -5,8 +5,14 @@ export const getMyTickets = async () => {
     return response.data;
 };
 
-export const getAllTickets = async () => {
-    const response = await api.get("/tickets");
+export const getAllTickets = async (page = 1, limit = 10) => {
+    const response = await api.get("/tickets", {
+        params: {
+            page,
+            limit
+        }
+    });
+
     return response.data;
 };
 

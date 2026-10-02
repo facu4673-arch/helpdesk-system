@@ -41,7 +41,7 @@ function SupportDashboard() {
                 getTicketStats()
             ]);
 
-            setTickets(ticketsData);
+            setTickets(ticketsData.tickets);
             setStats(statsData);
 
         } catch (error) {

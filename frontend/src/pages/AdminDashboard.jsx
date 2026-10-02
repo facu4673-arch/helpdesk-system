@@ -40,6 +40,8 @@ function AdminDashboard() {
     // ==========================================
 
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalTickets, setTotalTickets] = useState(0);
 
     const ticketsPerPage = 10;
 
@@ -81,7 +83,7 @@ function AdminDashboard() {
     }, []);
 
 
-    const loadDashboard = async () => {
+    const loadDashboard = async (page = 1) => {
 
         try {
 
@@ -93,12 +95,14 @@ function AdminDashboard() {
                 statsData,
                 usersData
             ] = await Promise.all([
-                getAllTickets(),
+                getAllTickets(page, ticketsPerPage),
                 getTicketStats(),
                 getUsers()
             ]);
 
-            setTickets(ticketsData);
+            setTickets(ticketsData.tickets);
+            setTotalPages(ticketsData.totalPages);
+            setTotalTickets(ticketsData.total);
             setStats(statsData);
             setUsers(usersData);
 
@@ -177,16 +181,7 @@ function AdminDashboard() {
     // DATOS DE PAGINACIÓN
     // ==========================================
 
-    const totalPages = Math.ceil(
-        filteredTickets.length / ticketsPerPage
-    );
-
-    const startIndex = (currentPage - 1) * ticketsPerPage;
-
-    const paginatedTickets = filteredTickets.slice(
-        startIndex,
-        startIndex + ticketsPerPage
-    );
+    const paginatedTickets = filteredTickets;
 
     // ==========================================
     // SELECCIONAR SOPORTE
@@ -245,11 +240,11 @@ function AdminDashboard() {
                 ticketsData,
                 statsData
             ] = await Promise.all([
-                getAllTickets(),
+                getAllTickets(currentPage, ticketsPerPage),
                 getTicketStats()
             ]);
 
-            setTickets(ticketsData);
+            setTickets(ticketsData.tickets);
             setStats(statsData);
 
 
@@ -1048,22 +1043,22 @@ function AdminDashboard() {
                     Mostrando{" "}
 
                     <span className="font-semibold text-gray-700">
-                        {startIndex + 1}
+                        {((currentPage - 1) * ticketsPerPage) + 1}
                     </span>
 
                     {" "}a{" "}
 
                     <span className="font-semibold text-gray-700">
                         {Math.min(
-                            startIndex + ticketsPerPage,
-                            filteredTickets.length
+                            currentPage * ticketsPerPage,
+                            totalTickets
                         )}
                     </span>
 
                     {" "}de{" "}
 
                     <span className="font-semibold text-gray-700">
-                        {filteredTickets.length}
+                        {totalTickets}
                     </span>
 
                     {" "}tickets
@@ -1075,9 +1070,11 @@ function AdminDashboard() {
 
                     <button
                         type="button"
-                        onClick={() =>
-                            setCurrentPage((page) => page - 1)
-                        }
+                        onClick={() => {
+                            const previousPage = currentPage - 1;
+                            setCurrentPage(previousPage);
+                            loadDashboard(previousPage);
+                        }}
                         disabled={currentPage === 1}
                         className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
                     >
@@ -1092,9 +1089,11 @@ function AdminDashboard() {
 
                     <button
                         type="button"
-                        onClick={() =>
-                            setCurrentPage((page) => page + 1)
-                        }
+                        onClick={() => {
+                            const nextPage = currentPage + 1;
+                            setCurrentPage(nextPage);
+                            loadDashboard(nextPage);
+                        }}
                         disabled={currentPage === totalPages}
                         className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
                     >
